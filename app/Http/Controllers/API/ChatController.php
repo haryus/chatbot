@@ -14,10 +14,9 @@ use Illuminate\Support\Str;
 class ChatController extends Controller
 {
     public function conversations(Request $request) {
-        $conversations = ChatHistory::where('user_id', $request->user()->id)
-            ->distinct('conversation_id')
-            ->orderBy('created_at', 'desc')
-            ->get(['conversation_id', 'created_at']);
+        $conversations = Conversation::where('user_id', $request->user()->id)
+            ->latest()
+            ->get();
 
         return response()->json([
             'status' => 'success',
@@ -25,17 +24,36 @@ class ChatController extends Controller
         ]);
     }
     public function messages(Request $request, $id) {
-        $messages = ChatHistory::where('user_id', $request->user()->id)
+        $history = ChatHistory::where('user_id', $request->user()->id)
             ->where('conversation_id', $id)
-            ->orderBy('created_at', 'asc')
+            ->orderBy('created_at')
             ->get();
+
+        $messages = [];
+
+        foreach ($history as $chat) {
+
+            $messages[] = [
+                'role' => 'user',
+                'content' => $chat->message,
+                'created_at' => $chat->created_at,
+            ];
+
+            if ($chat->reply) {
+                $messages[] = [
+                    'role' => 'assistant',
+                    'content' => $chat->reply,
+                    'created_at' => $chat->updated_at,
+                ];
+            }
+        }
 
         return response()->json([
             'status' => 'success',
-            'data' => $messages
+            'conversation_id' => $id,
+            'messages' => $messages,
         ]);
     }
-
     public function deleteConversation(Request $request, $id) {
         $deleted = ChatHistory::where('user_id', $request->user()->id)
             ->where('conversation_id', $id)
@@ -67,7 +85,6 @@ class ChatController extends Controller
             'data' => $chatHistory
         ], 201);
     }
-
     public function send(Request $request) {
         $question = $request->message;
 
@@ -82,10 +99,21 @@ class ChatController extends Controller
         ".KnowledgeArticle::all()->pluck('content')->implode("\n");
 
         $reply = app('App\\Services\\AIService')->ask($question,$context);
-        $conversation = Conversation::create([
-            'user_id' => auth()->id(),
-            'title' => Str::limit($question, 40),
-        ]);
+        if ($request->filled('conversation_id')) {
+
+            $conversation = Conversation::where('id', $request->conversation_id)
+                ->where('user_id', auth()->id())
+                ->firstOrFail();
+
+        } else {
+
+            // Create a new conversation
+            $conversation = Conversation::create([
+                'user_id' => auth()->id(),
+                'title' => Str::limit($question, 40),
+            ]);
+        }
+
         ChatHistory::create([
             'user_id'=>auth()->id(),
             'conversation_id' => $conversation->id,
