@@ -88,9 +88,10 @@ class ChatController extends Controller
     public function send(Request $request) {
         $question = $request->message;
 
-        $context = "You are MBB Customer Support.
+        $context = "You are MBB AI Chatbot.
 
         Answer ONLY using the information below.
+        If the question cannot be answered using the FAQ or Knowledge Base below, reply only with: 'This question is not related to our support topics.' Do not add any other text.
 
         FAQ:
         ".FAQ::all()->pluck('answer','question')."
@@ -99,6 +100,9 @@ class ChatController extends Controller
         ".KnowledgeArticle::all()->pluck('content')->implode("\n");
 
         $reply = app('App\\Services\\AIService')->ask($question,$context);
+        return response()->json([
+            'reply'=>$reply
+        ]);
         if ($request->filled('conversation_id')) {
 
             $conversation = Conversation::where('id', $request->conversation_id)
@@ -123,6 +127,13 @@ class ChatController extends Controller
 
         return response()->json([
             'reply'=>$reply
+        ]);
+    }
+
+    public function getFAQs() {
+        return response()->json([
+            'status' => 'success',
+            'data' => FAQ::latest()->get(),
         ]);
     }
 }

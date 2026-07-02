@@ -25,6 +25,7 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             FAQSeeder::class,
             KnowledgeArticleSeeder::class,
+            AiProviderSeeder::class,
         ]);
     }
 }

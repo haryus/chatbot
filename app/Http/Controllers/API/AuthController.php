@@ -3,32 +3,55 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
-    public function login(Request $request)
+    public function register(Request $request)
     {
-        $credentials = $request->validate([
-            'email' => ['required', 'email'],
-            'password' => ['required'],
+        $validated = $request->validate([
+            'name'     => ['required', 'string', 'max:255'],
+            'email'    => ['required', 'email', 'unique:users,email'],
+            'password' => ['required', 'string', 'min:8'],
         ]);
 
-        if (! Auth::attempt($credentials)) {
+        $referenceNo = 'REF-' . strtoupper(Str::random(8));
+
+        User::create([
+            'name'         => $validated['name'],
+            'email'        => $validated['email'],
+            'password'     => bcrypt($validated['password']),
+            'reference_no' => $referenceNo,
+        ]);
+
+        return response()->json([
+            'message'      => 'Registration successful.',
+            'reference_no' => $referenceNo,
+        ], 201);
+    }
+
+    public function login(Request $request)
+    {
+        $request->validate([
+            'reference_no' => ['required', 'string'],
+        ]);
+
+        $user = User::where('reference_no', $request->reference_no)->first();
+
+        if (! $user) {
             return response()->json([
-                'message' => 'Invalid email or password.'
+                'message' => 'Invalid reference number.'
             ], 401);
         }
-
-        $user = Auth::user();
 
         $token = $user->createToken('chatbot')->plainTextToken;
 
         return response()->json([
             'message' => 'Login successful.',
-            'token' => $token,
-            'user' => $user,
+            'token'   => $token,
+            'user'    => $user,
         ]);
     }
 

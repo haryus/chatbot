@@ -10,67 +10,181 @@ class FAQSeeder extends Seeder
     public function run(): void
     {
         $faqs = [
-
             [
-                'question' => 'How do I create a BeePay account?',
+                'question' => 'What is the BeePay API base URL?',
+                'answer' => 'The BeePay API base URL is https://pay.mybusybee.net/api.',
                 'project' => 'BeePay',
-                'answer' => 'Download the BeePay app, register using your mobile number, verify your email address, and complete the KYC process.',
             ],
-
             [
-                'question' => 'How can I cash in?',
+                'question' => 'How do I authenticate with the API?',
+                'answer' => 'Send a POST request to /login with your email and password to receive authentication credentials.',
                 'project' => 'BeePay',
-                'answer' => 'You can cash in using online banking, partner outlets, over-the-counter payment centers, or QR-enabled merchants.',
             ],
-
             [
-                'question' => 'How do I cash out?',
+                'question' => 'What headers are required after login?',
+                'answer' => 'Most protected endpoints require X-API-KEY, X-TIMESTAMP, X-SIGNATURE, and X-HASH.',
                 'project' => 'BeePay',
-                'answer' => 'Cash out by visiting any BeePay partner outlet or transfer your balance to your linked bank account.',
             ],
-
             [
-                'question' => 'How do I transfer money?',
+                'question' => 'How do I logout?',
+                'answer' => 'Send a POST request to /logout with the required authentication headers.',
                 'project' => 'BeePay',
-                'answer' => 'Open the Transfer Money menu, enter the recipient details, review the information, and confirm the transaction.',
             ],
-
             [
-                'question' => 'How long does a transfer take?',
+                'question' => 'How do I create a payment transaction?',
+                'answer' => 'Send a POST request to /transaction/create with the required transaction information.',
                 'project' => 'BeePay',
-                'answer' => 'Most transfers are completed within a few minutes. Some bank transfers may take longer depending on the receiving bank.',
             ],
-
             [
-                'question' => 'What should I do if my transaction is pending?',
+                'question' => 'What is the minimum transaction amount?',
+                'answer' => 'The minimum transaction amount is ₱20.',
                 'project' => 'BeePay',
-                'answer' => 'Please wait for a few minutes. If the status remains pending, contact BeePay Customer Support and provide your transaction reference number.',
             ],
-
             [
-                'question' => 'How do I reset my password?',
+                'question' => 'Which payment methods are supported?',
+                'answer' => 'BeePay currently supports GCash, Maya, and QRPH.',
                 'project' => 'BeePay',
-                'answer' => 'Tap Forgot Password on the login screen and follow the password reset instructions sent to your registered email or mobile number.',
             ],
-
             [
-                'question' => 'How do I verify my account?',
+                'question' => 'Which fields are required for Maya payments?',
+                'answer' => 'Maya requires first_name, last_name, email, and mobile_number.',
                 'project' => 'BeePay',
-                'answer' => 'Upload a valid government-issued ID and complete the facial verification process inside the BeePay application.',
             ],
-
             [
-                'question' => 'What IDs are accepted?',
+                'question' => 'Are customer details required for GCash?',
+                'answer' => 'No. GCash only requires the basic transaction information.',
                 'project' => 'BeePay',
-                'answer' => 'Passport, Driver License, UMID, National ID, PRC ID, and other government-issued IDs are accepted.',
             ],
-
             [
-                'question' => 'How do I contact customer support?',
+                'question' => 'Are customer details required for QRPH?',
+                'answer' => 'No. QRPH does not require customer information.',
                 'project' => 'BeePay',
-                'answer' => 'You may contact BeePay Customer Support through the in-app chat, email, or official support hotline.',
             ],
-
+            [
+                'question' => 'Is destination_url required?',
+                'answer' => 'No. destination_url is optional.',
+                'project' => 'BeePay',
+            ],
+            [
+                'question' => 'Can I add custom fields?',
+                'answer' => 'Yes. custom_field_1 and custom_field_2 are optional.',
+                'project' => 'BeePay',
+            ],
+            [
+                'question' => 'What does the API return after creating a transaction?',
+                'answer' => 'It returns redirect_url, trx_id, signature, and optional custom fields.',
+                'project' => 'BeePay',
+            ],
+            [
+                'question' => 'What is redirect_url?',
+                'answer' => 'redirect_url is the payment page where the customer completes the payment.',
+                'project' => 'BeePay',
+            ],
+            [
+                'question' => 'What is trx_id?',
+                'answer' => 'trx_id is the unique transaction identifier generated by BeePay.',
+                'project' => 'BeePay',
+            ],
+            [
+                'question' => 'What is the signature in the response?',
+                'answer' => 'It is a security token used to verify callback authenticity.',
+                'project' => 'BeePay',
+            ],
+            [
+                'question' => 'How do I check transaction status?',
+                'answer' => 'Use GET /transaction/status and provide an array of transaction numbers.',
+                'project' => 'BeePay',
+            ],
+            [
+                'question' => 'How many transaction numbers can I check at once?',
+                'answer' => 'Up to 100 transaction numbers per request.',
+                'project' => 'BeePay',
+            ],
+            [
+                'question' => 'What happens if trx_nos is missing?',
+                'answer' => 'The API returns an error stating trx_nos is required.',
+                'project' => 'BeePay',
+            ],
+            [
+                'question' => 'Can I resend payment callbacks?',
+                'answer' => 'Yes. Use /webhook/resend-by-invoice.',
+                'project' => 'BeePay',
+            ],
+            [
+                'question' => 'What is required for resend callback?',
+                'answer' => 'Provide an array of invoice numbers.',
+                'project' => 'BeePay',
+            ],
+            [
+                'question' => 'What is the maximum invoice numbers allowed?',
+                'answer' => 'Maximum of 100 invoice numbers per request.',
+                'project' => 'BeePay',
+            ],
+            [
+                'question' => 'How do I create a cashout transaction?',
+                'answer' => 'Use POST /cash-out-transaction/create.',
+                'project' => 'BeePay',
+            ],
+            [
+                'question' => 'What is an Idempotency-Key?',
+                'answer' => 'It prevents duplicate cashout transactions when the same request is retried.',
+                'project' => 'BeePay',
+            ],
+            [
+                'question' => 'Is Idempotency-Key required?',
+                'answer' => 'No, but it is highly recommended.',
+                'project' => 'BeePay',
+            ],
+            [
+                'question' => 'What happens after creating a cashout?',
+                'answer' => 'An OTP is sent to the registered email.',
+                'project' => 'BeePay',
+            ],
+            [
+                'question' => 'How do I verify the OTP?',
+                'answer' => 'Call POST /cash-out-transaction/verify-otp with the OTP.',
+                'project' => 'BeePay',
+            ],
+            [
+                'question' => 'How do I check cashout status?',
+                'answer' => 'Use GET /cash-out-transaction/status.',
+                'project' => 'BeePay',
+            ],
+            [
+                'question' => 'Does BeePay support bulk cashout?',
+                'answer' => 'A bulk upload endpoint exists but is currently unavailable.',
+                'project' => 'BeePay',
+            ],
+            [
+                'question' => 'What file format is used for bulk upload?',
+                'answer' => 'Excel (.xlsx).',
+                'project' => 'BeePay',
+            ],
+            [
+                'question' => 'What callback data does BeePay send?',
+                'answer' => 'The callback payload contains trx_no, status, and signature.',
+                'project' => 'BeePay',
+            ],
+            [
+                'question' => 'How do I verify callback authenticity?',
+                'answer' => 'Validate the signature received in the callback payload.',
+                'project' => 'BeePay',
+            ],
+            [
+                'question' => 'Why am I getting Unauthorized?',
+                'answer' => 'Check your authentication headers and credentials.',
+                'project' => 'BeePay',
+            ],
+            [
+                'question' => 'Why am I getting Invalid Credentials?',
+                'answer' => 'Verify your login email and password.',
+                'project' => 'BeePay',
+            ],
+            [
+                'question' => 'Why is my transaction rejected?',
+                'answer' => 'Possible reasons include the amount being below ₱20, no assigned aggregator, no available merchant, or the daily transaction limit being exceeded.',
+                'project' => 'BeePay',
+            ],
         ];
 
         foreach ($faqs as $faq) {
